@@ -4,16 +4,12 @@
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/appengine-api-stubs.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/appengine-local-runtime.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/appengine-testing.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/datanucleus-core-1.1.5.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/datanucleus-jpa-1.1.5.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/geronimo-jpa_3.0_spec-1.1.1.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/geronimo-jta_1.1_spec-1.1.1.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/jdo2-api-2.3-eb.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/jsr107cache-1.1.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/gson-1.5.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/junit-4.8.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/focaplo-common.jar"/>
+	<classpathentry kind="var" path="GAE_SDK_ROOT/lib/impl/appengine-api-labs.jar"/>
+	<classpathentry kind="var" path="GAE_SDK_ROOT/lib/impl/appengine-api-stubs.jar"/>
+	<classpathentry kind="var" path="GAE_SDK_ROOT/lib/impl/appengine-api.jar"/>
+	<classpathentry kind="var" path="GAE_SDK_ROOT/lib/testing/appengine-testing.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

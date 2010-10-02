@@ -8,8 +8,16 @@
 		<servlet-name>yardsale</servlet-name>
 		<servlet-class>com.focaplo.mylocal.yardsaleServlet</servlet-class>
 	</servlet>
+	<servlet>
+		<servlet-name>blobdataservlet</servlet-name>
+		<servlet-class>com.focaplo.mylocal.BlobDataServlet</servlet-class>
+	</servlet>
 	<servlet-mapping>
 		<servlet-name>yardsale</servlet-name>
 		<url-pattern>/yardsale</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>blobdataservlet</servlet-name>
+		<url-pattern>/BlobDataServlet</url-pattern>
 	</servlet-mapping>
 </web-app>

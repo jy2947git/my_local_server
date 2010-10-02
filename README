@@ -1,0 +1,22 @@
+
+
+Classpath Setting:
+
+1, you can put additional jars under /war/lib, and add them to buid path. However, do not add those jars managed by AppEngine (there
+are about 10 jars)
+
+2, to do local unit test:
+First set the GAE_SDK_ROOT variable
+/Users/jyou00/eclipse/plugins/com.google.appengine.eclipse.sdkbundle.1.3.7_1.3.7.v201008311427/appengine-java-sdk-1.3.7
+Then
+Have these dependencies you'll need a few more JARs on your testing classpath: 
+${SDK_ROOT}/lib/impl/appengine-api.jar, 
+${SDK_ROOT}/lib/impl/appengine-api-labs.jar, 
+and ${SDK_ROOT}/lib/impl/appengine-api-stubs.jar. 
+These JARs make the runtime APIs and the local implementations of those APIs available to your tests.
+You could stop here, but you would quickly learn that App Engine services expect a number of things from 
+their execution environment and that setting these things up involves a fair amount of boilerplate code. 
+So, rather than setting it up yourself let's ask the utilities in the com.google.appengine.tools.development.testing 
+package to do the heavy lifting for us. 
+The code in this package lives in ${SDK_ROOT}/lib/testing/appengine-testing.jar 
+so you'll need to add that JAR to your testing classpath. Then, take a minute to browse the javadoc for this package.
