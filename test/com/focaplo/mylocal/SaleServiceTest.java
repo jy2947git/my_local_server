@@ -67,17 +67,19 @@ public class SaleServiceTest extends LocalDatastoreTest{
 		{
 			SaleItem item = this.createSaleItem();
 			String res = test.saveItem(item);
-			java.lang.System.out.println("saved " + res);
+			java.lang.System.out.println("saved item:" + res);
 			//save image
 			String jsonRes = test.saveItemImage(item.getItemId(), "aoaao");
-			java.lang.System.out.println(jsonRes);
+			java.lang.System.out.println("Save Image:"+jsonRes);
 			Gson gson = new Gson();
 			Type parameterizedType = new TypeToken<RequestResult<ImageInfo>>() {}.getType();
 			
 			RequestResult<ImageInfo> rs = gson.fromJson(jsonRes, parameterizedType);
 			ImageInfo imageInfo = (ImageInfo)rs.getData().get(0);
 			//save icon image
-			java.lang.System.out.println(test.saveItemIconImage(imageInfo.getImageId(), "aoaao"));
+			java.lang.System.out.println("Save Icon image:"+test.saveItemIconImage(imageInfo.getImageId(), "aoaao"));
+			//search
+			System.out.println("Search Images:" + test.getItemIconImages(item.getItemId()));
 		}
 		
 		

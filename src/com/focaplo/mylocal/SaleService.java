@@ -189,6 +189,35 @@ public class SaleService {
 
 	}
 	
+	/**
+	 * return the Json request-result of ImageInfo associated with the given item id
+	 * @param itemId
+	 * @return
+	 */
+	public String getItemIconImages(Long itemId){
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		Query query = null;
+		try{
+			Extent<ImageInfo> extent = pm.getExtent(ImageInfo.class, true);
+			String filter = "itemId==inputItemId";
+			query = pm.newQuery(extent, filter);
+			query.declareParameters("Long inputItemId");
+			Collection<ImageInfo> results = (Collection<ImageInfo>) query.execute(itemId);
+			RequestResult<ImageInfo> rr = new RequestResult<ImageInfo>();
+			rr.setGood();
+			rr.getData().addAll(results);
+			Type parameterizedType = new TypeToken<RequestResult<ImageInfo>>() {}.getType();
+			Gson gson = new Gson();
+			return gson.toJson(rr, parameterizedType);
+		}catch(Exception e){
+			return errorResultToJson(e);
+		}finally{
+			query.closeAll();
+			pm.close();
+		}
+	}
+	
+	
 	@SuppressWarnings("unchecked")
 	@Transactional
 	public String deleteOldRecordsBeforeDate(Date date){
