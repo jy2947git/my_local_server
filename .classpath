@@ -11,5 +11,6 @@
 	<classpathentry kind="var" path="GAE_SDK_ROOT/lib/impl/appengine-api-stubs.jar"/>
 	<classpathentry kind="var" path="GAE_SDK_ROOT/lib/impl/appengine-api.jar"/>
 	<classpathentry kind="var" path="GAE_SDK_ROOT/lib/testing/appengine-testing.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/log4j-1.2.13.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

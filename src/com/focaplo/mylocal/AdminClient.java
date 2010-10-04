@@ -16,12 +16,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import org.apache.log4j.Logger;
 import org.junit.Test;
 
 public class AdminClient{
 	//String server="http://localhost:8082/yardsale?token=" + yardsaleServlet.token;
 	String server="http://senselocal.appspot.com/yardsale";
-	
+	protected final Logger log = Logger.getLogger(this.getClass());
 	private SaleItem createSaleItem(int i) throws ParseException{
 		SaleItem item = new SaleItem();
 		item.setUserUniqueId("seller"+i);
@@ -44,10 +45,6 @@ public class AdminClient{
 		endDate.add(Calendar.DAY_OF_YEAR, 13);
 		item.setStartDateDate(beginDate.getTime());
 		item.setEndDateDate(endDate.getTime());
-		
-		item.getImages().add("http://images.google.com/"+i);
-		item.getImages().add("http://images.google.com/2"+i);
-		item.getImages().add("http://images.google.com/3"+i);
 		return item;
 	}
 	

@@ -12,6 +12,14 @@
 		<servlet-name>blobdataservlet</servlet-name>
 		<servlet-class>com.focaplo.mylocal.BlobDataServlet</servlet-class>
 	</servlet>
+	<servlet>
+		<servlet-name>IconImageResizeServlet</servlet-name>
+		<servlet-class>com.focaplo.mylocal.IconImageResizeServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>IconImageResizeSuccessServlet</servlet-name>
+		<servlet-class>com.focaplo.mylocal.IconImageResizeSuccessServlet</servlet-class>
+	</servlet>
 	<servlet-mapping>
 		<servlet-name>yardsale</servlet-name>
 		<url-pattern>/yardsale</url-pattern>
@@ -19,5 +27,13 @@
 	<servlet-mapping>
 		<servlet-name>blobdataservlet</servlet-name>
 		<url-pattern>/BlobDataServlet</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>IconImageResizeServlet</servlet-name>
+		<url-pattern>/IconImageResizeServlet</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>IconImageResizeSuccessServlet</servlet-name>
+		<url-pattern>/IconImageResizeSuccessServlet</url-pattern>
 	</servlet-mapping>
 </web-app>

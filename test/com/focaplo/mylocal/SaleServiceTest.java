@@ -1,15 +1,17 @@
 package com.focaplo.mylocal;
 
+import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Test;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 
 
@@ -29,9 +31,7 @@ public class SaleServiceTest extends LocalDatastoreTest{
 		item.setStartDateDate(beginDate.getTime());
 		item.setEndDateDate(endDate.getTime());
 		
-		item.getImages().add("http://images.google.com/22");
-		item.getImages().add("http://images.google.com/23");
-		item.getImages().add("http://images.google.com/24");
+		
 		return item;
 	}
 	@Test
@@ -65,9 +65,19 @@ public class SaleServiceTest extends LocalDatastoreTest{
 	public void testAdd() throws ParseException{
 		SaleService test = new SaleService();
 		{
-
-			String id = test.saveItem(this.createSaleItem());
-			java.lang.System.out.println("saved " + id);
+			SaleItem item = this.createSaleItem();
+			String res = test.saveItem(item);
+			java.lang.System.out.println("saved " + res);
+			//save image
+			String jsonRes = test.saveItemImage(item.getItemId(), "aoaao");
+			java.lang.System.out.println(jsonRes);
+			Gson gson = new Gson();
+			Type parameterizedType = new TypeToken<RequestResult<ImageInfo>>() {}.getType();
+			
+			RequestResult<ImageInfo> rs = gson.fromJson(jsonRes, parameterizedType);
+			ImageInfo imageInfo = (ImageInfo)rs.getData().get(0);
+			//save icon image
+			java.lang.System.out.println(test.saveItemIconImage(imageInfo.getImageId(), "aoaao"));
 		}
 		
 		
@@ -96,8 +106,9 @@ public class SaleServiceTest extends LocalDatastoreTest{
 		RequestResult mapResult = gson.fromJson(jsonresult, RequestResult.class);
 		System.out.println(mapResult);
 		java.lang.System.out.println(mapResult.getStatus());
-		List<SaleItem> items2 = (List<SaleItem>)mapResult.getData();
-		for(SaleItem si : items2){
+		List<Serializable> items2 = (List<Serializable>)mapResult.getData();
+		for(Serializable si : items2){
+			
 			System.out.println(si);
 		}
 	}

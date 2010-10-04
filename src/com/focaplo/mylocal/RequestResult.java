@@ -1,14 +1,15 @@
 package com.focaplo.mylocal;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RequestResult {
+public class RequestResult<E>{
 	public static String good = "good";
 	public static String error = "error";
 	
 	private String status;
-	private List<SaleItem> data = new ArrayList<SaleItem>();
+	private List<E> data = new ArrayList<E>();
 	private String errorMessage;
 	private String input;
 	
@@ -32,10 +33,11 @@ public class RequestResult {
 	public void setStatus(String status) {
 		this.status = status;
 	}
-	public List<SaleItem> getData() {
+
+	public List<E> getData() {
 		return data;
 	}
-	public void setData(List<SaleItem> data) {
+	public void setData(List<E> data) {
 		this.data = data;
 	}
 	public String getErrorMessage() {

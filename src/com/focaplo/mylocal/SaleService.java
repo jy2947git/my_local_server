@@ -1,5 +1,7 @@
 package com.focaplo.mylocal;
 
+
+import java.lang.reflect.Type;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -11,15 +13,18 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.annotations.Transactional;
 
+import org.apache.log4j.Logger;
+
 import com.focaplo.common.Geohash;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 
 public class SaleService {
 	double latitude_sope=0.3; // 30 KM square
 	double longitude_scope=3;
 //	int date_scope=7;
-
+	protected final Logger log = Logger.getLogger(this.getClass());
 	Geohash geohash = new Geohash();
 	
 	public SaleItem fromJson(String jsonString){
@@ -34,41 +39,46 @@ public class SaleService {
 	
 	public String getResultToJson(SaleItem item){
 		Gson gson = new Gson();
-		RequestResult rr = new RequestResult();
+		RequestResult<SaleItem> rr = new RequestResult<SaleItem>();
 		rr.setGood();
 		rr.getData().add(item);
-		return gson.toJson(rr, RequestResult.class);
+		Type parameterizedType = new TypeToken<RequestResult<SaleItem>>() {}.getType();
+		return gson.toJson(rr, parameterizedType);
 	}
 	
 	public String browseResultsToJson(List<SaleItem> items){
 		Gson gson = new Gson();
-		RequestResult rr = new RequestResult();
+		RequestResult<SaleItem> rr = new RequestResult<SaleItem>();
 		rr.setGood();
 		rr.getData().addAll(items);
-		return gson.toJson(rr, RequestResult.class);
+		Type parameterizedType = new TypeToken<RequestResult<SaleItem>>() {}.getType();
+		return gson.toJson(rr, parameterizedType);
 	}
 	
 	public String saveResultToJson(SaleItem item){
 		Gson gson = new Gson();
-		RequestResult rr = new RequestResult();
+		RequestResult<SaleItem> rr = new RequestResult<SaleItem>();
 		rr.setGood();
 		rr.getData().add(item);
-		return gson.toJson(rr, RequestResult.class);
+		Type parameterizedType = new TypeToken<RequestResult<SaleItem>>() {}.getType();
+		return gson.toJson(rr, parameterizedType);
 	}
 	
 	public String removeResultToJson(){
 		Gson gson = new Gson();
-		RequestResult rr = new RequestResult();
+		RequestResult<ImageInfo> rr = new RequestResult<ImageInfo>();
 		rr.setGood();
-		return gson.toJson(rr, RequestResult.class);
+		Type parameterizedType = new TypeToken<RequestResult<SaleItem>>() {}.getType();
+		return gson.toJson(rr, parameterizedType);
 	}
 	
 	public String errorResultToJson(Exception exception){
 		Gson gson = new Gson();
-		RequestResult rr = new RequestResult();
+		RequestResult<SaleItem> rr = new RequestResult<SaleItem>();
 		rr.setError(exception);
 		
-		return gson.toJson(rr, RequestResult.class);
+		Type parameterizedType = new TypeToken<RequestResult<SaleItem>>() {}.getType();
+		return gson.toJson(rr, parameterizedType);
 	}
 	@Transactional
 	public String deleteItem(int itemId){
@@ -88,13 +98,56 @@ public class SaleService {
 		item.setGeohash(geohash.encode(item.getLongitude(), item.getLatitude()));
 		try{
 			pm.makePersistent(item);
+			log.debug("saved " + item.getItemId());
 			return saveResultToJson(item);
 		}catch(Exception e){
+			log.error("Error", e);
 			return errorResultToJson(e);
 		}finally{
 			pm.close();
 		}
 		
+	}
+	
+	@Transactional
+	public String saveItemImage(Long itemId, String imageKey){
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		ImageInfo ii = new ImageInfo();
+		ii.setImageBlobKey(imageKey);
+		ii.setItemId(itemId);
+		try{
+			pm.makePersistent(ii);
+			Gson gson = new Gson();
+			RequestResult<ImageInfo> rr = new RequestResult<ImageInfo>();
+			rr.setGood();
+			rr.getData().add(ii);
+			Type parameterizedType = new TypeToken<RequestResult<ImageInfo>>() {}.getType();
+			return gson.toJson(rr, parameterizedType);
+		}catch(Exception e){
+			return errorResultToJson(e);
+		}finally{
+			pm.close();
+		}
+	}
+	
+	@Transactional
+	public String saveItemIconImage(Long imageId, String iconKey){
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try{
+			ImageInfo info = (ImageInfo) pm.getObjectById(ImageInfo.class, imageId);
+			info.setImageIconBlobKey(iconKey);
+			pm.makePersistent(info);
+			Gson gson = new Gson();
+			RequestResult<ImageInfo> rr = new RequestResult<ImageInfo>();
+			rr.setGood();
+			rr.getData().add(info);
+			Type parameterizedType = new TypeToken<RequestResult<ImageInfo>>() {}.getType();
+			return gson.toJson(rr, parameterizedType);
+		}catch(Exception e){
+			return errorResultToJson(e);
+		}finally{
+			pm.close();
+		}
 	}
 	/*
 	public String saveItem(String itemId, String userId, String address, String description, String latitude, String longitude, String startDateString, String endDateString) throws ParseException{

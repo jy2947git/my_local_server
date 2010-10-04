@@ -9,10 +9,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
+
 import com.google.gson.Gson;
 
 @SuppressWarnings("serial")
 public class yardsaleServlet extends HttpServlet {
+	protected final Logger log = Logger.getLogger(this.getClass());
 	public static String token="29073429202020128953";
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)

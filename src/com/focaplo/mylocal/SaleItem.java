@@ -1,5 +1,6 @@
 package com.focaplo.mylocal;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -11,9 +12,10 @@ import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+import javax.persistence.Entity;
 @PersistenceCapable(identityType = IdentityType.APPLICATION)
 
-public class SaleItem {
+public class SaleItem{
 	static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 	
 	@PrimaryKey
@@ -50,9 +52,10 @@ public class SaleItem {
 	@Persistent
 	private String phone;
 	@Persistent
-	private String emai;;
+	private String email;
 	@Persistent
-	private List<String> images = new ArrayList<String>();
+	private List<Long> images = new ArrayList<Long>();
+
 	
 	public String getAddress1() {
 		return address1;
@@ -96,11 +99,12 @@ public class SaleItem {
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
-	public String getEmai() {
-		return emai;
+
+	public String getEmail() {
+		return email;
 	}
-	public void setEmai(String emai) {
-		this.emai = emai;
+	public void setEmail(String email) {
+		this.email = email;
 	}
 	public String getUserUniqueId() {
 		return userUniqueId;
@@ -189,11 +193,14 @@ public class SaleItem {
 	public void setEndDate(String endDate) {
 		this.endDate = endDate;
 	}
-	public List<String> getImages() {
+	public List<Long> getImages() {
 		return images;
 	}
-	public void setImages(List<String> images) {
+	public void setImages(List<Long> images) {
 		this.images = images;
 	}
+
+
+
 	
 }
