@@ -53,9 +53,10 @@ public class Sale{
 	private String phone;
 	@Persistent
 	private String email;
+	//ids of ImageInfo, purposely keep them un-related to avoid problems of one-to-many implementations on GAE
 	@Persistent
 	private List<Long> images = new ArrayList<Long>();
-
+	
 	
 	public String getAddress1() {
 		return address1;
@@ -124,11 +125,12 @@ public class Sale{
 		buf.append("id=" + this.saleId + " deviceId=" + this.userUniqueId + " address1=" + this.getAddress1() + " description=" + this.getDescription() + " startFrom=" + this.startDate + " end=" + this.endDate + " latitude=" + this.getLatitude() + " longitude=" + this.getLongitude() + " geohash=" + this.geohash);
 		return buf.toString();
 	}
-	public Long getItemId() {
+
+	public Long getSaleId() {
 		return saleId;
 	}
-	public void setItemId(Long itemId) {
-		this.saleId = itemId;
+	public void setSaleId(Long saleId) {
+		this.saleId = saleId;
 	}
 	public Double getLatitude() {
 		return latitude;

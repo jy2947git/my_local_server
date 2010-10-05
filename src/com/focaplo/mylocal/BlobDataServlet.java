@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -19,6 +20,9 @@ import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
 import com.google.appengine.api.labs.taskqueue.Queue;
 import com.google.appengine.api.labs.taskqueue.QueueFactory;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import static com.google.appengine.api.labs.taskqueue.TaskOptions.Builder.*;
 
 /**
@@ -38,18 +42,27 @@ public class BlobDataServlet extends HttpServlet {
 	public void doPost(HttpServletRequest req, HttpServletResponse res)
 			throws ServletException, IOException {
 		log.info("this is after GAE saved the uploaded blob to blobstore");
-		String itemId = req.getParameter("itemId");
-		log.info("item=" + itemId);
+		String saleId = req.getParameter("saleId");
+		log.info("item=" + saleId);
 		Map<String, BlobKey> blobs = blobstoreService.getUploadedBlobs(req);
 		BlobKey blobKey = blobs.get("myFile");
 
 		log.info("blob key:" + blobKey.getKeyString());
 		//save the item-image
 		SaleService saleService = new SaleService();
-		String jsonResOfImageInfo = saleService.saveItemImage(new Long(itemId), blobKey.getKeyString());
-		// start a backend task to trim the small
-		// size image
-		this.enqueueIconImageResizing(itemId, blobKey.getKeyString());
+		String jsonResOfImageInfo = saleService.saveSaleImage(new Long(saleId), blobKey.getKeyString());
+		//find the new image-id, need it to save the icon-image later
+		Gson gson = new Gson();
+		Type parameterizedType = new TypeToken<RequestResult<ImageInfo>>() {}.getType();
+		RequestResult<ImageInfo> rr = gson.fromJson(jsonResOfImageInfo, parameterizedType);
+		if("good".equalsIgnoreCase(rr.getStatus())){
+			ImageInfo image = rr.getData().get(0);
+			Long imageId = image.getImageId();
+			// start a backend task to trim the small
+			// size image
+			this.enqueueIconImageResizing(saleId, imageId, blobKey.getKeyString());
+		}
+		
 		// redirct to blob list page for testing purpose
 		//res.sendRedirect("/BlobDataServlet");
 		res.setContentType("text/plain");
@@ -61,17 +74,26 @@ public class BlobDataServlet extends HttpServlet {
 	/* (non-Javadoc)
 	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 * 
-	 * Get method to list all the existing blob data from the store or serve the particular blob if blob-key is provided.
+	 * Get method to list all the existing blob data from the store or serve the particular blob if blobKey is provided.
 	 */
 	public void doGet(HttpServletRequest req, HttpServletResponse res)
 			throws IOException, ServletException {
-		if(req.getParameter("blob-key")!=null){
+		if(req.getParameter("blobKey")!=null){
 			this.serve(req, res);
 		}else{
-			this.list(req, res);
+			//this.list(req, res);
+			this.createUploadUrl(req, res);
 		}
 	}
 
+	private void createUploadUrl(HttpServletRequest req, HttpServletResponse res)throws IOException, ServletException{
+		String uploadUrl =  blobstoreService.createUploadUrl("http://senselocal.appspot.com/BlobDataServlet");
+		res.setContentType("text/plain");
+		res.setCharacterEncoding("UTF-8");
+        res.getWriter().println(uploadUrl);
+        res.getWriter().flush();
+		
+	}
 	private void list(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
 		log.info("listing all the existing blobs");
 		BlobInfoFactory bif = new BlobInfoFactory();
@@ -90,7 +112,7 @@ public class BlobDataServlet extends HttpServlet {
 	}
 	
 	private void serve(HttpServletRequest req, HttpServletResponse res) throws IOException {
-		BlobKey blobKey = new BlobKey(req.getParameter("blob-key"));
+		BlobKey blobKey = new BlobKey(req.getParameter("blobKey"));
         blobstoreService.serve(blobKey, res);
 	}
 	
@@ -98,7 +120,7 @@ public class BlobDataServlet extends HttpServlet {
 	 * Create a re-size task and put in the queue, which will be processed by the IconImageResizeServlet
 	 * @param imageBlobKey
 	 */
-	private void enqueueIconImageResizing(String itemId, String imageBlobKey) {
+	private void enqueueIconImageResizing(String saleId, Long imageId, String imageBlobKey) {
 		log.info("enqueuing " + imageBlobKey);
 		BlobInfoFactory bif = new BlobInfoFactory();
 		BlobInfo bi = bif.loadBlobInfo(new BlobKey(imageBlobKey));
@@ -106,8 +128,9 @@ public class BlobDataServlet extends HttpServlet {
 		Queue queue = QueueFactory.getQueue("icon-image-resize-processing");
 
 		queue.add(url("/IconImageResizeServlet")
-				.param("item-id", itemId)
-				.param("blob-key", imageBlobKey).param("new-name", newName)
+				.param("saleId", saleId)
+				.param("imageId", imageId.toString())
+				.param("blobKey", imageBlobKey).param("newName", newName)
 				.param("width", "20").param("height", "25"));
 	}
 

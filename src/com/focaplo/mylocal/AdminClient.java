@@ -64,7 +64,7 @@ public class AdminClient{
 			//mylagi+=0.01; //almost 1 KM
 			
 		
-			String jsonAddItem = this.doPost(server, "upload", service.toJson(si));
+			String jsonAddItem = NetUtility.doPost(server, new String[]{"token", "command","data"}, new String[]{yardsaleServlet.token,"upload", service.toJson(si)});
 			//now upload the image
 			
 		}
@@ -75,84 +75,53 @@ public class AdminClient{
 		String request="&command=purge&beforeDate=" + URLEncoder.encode("2009-08-01 10:00", "UTF-8");
 		
 		String req = server +  request;
-		System.out.println(this.doGet(req));
+		System.out.println(NetUtility.doGet(req));
 	}
 	@Test
 	public void browseAllData() throws URISyntaxException{
 		String req = server +  "?token="+yardsaleServlet.token+"&command=browse&start=1&end=100";
-		String allData = this.doGet(req);
+		String allData = NetUtility.doGet(req);
 		System.out.println(allData);
 		
 	}
-	private String doGet(String urlString) throws URISyntaxException{
-		//first encode
-		URI uri = new URI(urlString);
-		StringBuffer buf = new StringBuffer();
-		BufferedReader br = null;
-		
-		try {
-			URL url = uri.toURL();
-			System.out.println("sending request:" + url);
-			br = new BufferedReader(new InputStreamReader(url.openStream()));
-			String line;
-			
-			while((line=br.readLine())!=null){
-				System.out.println(line);
-				buf.append(line);
-			}
-			
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally{
-			try {
-				br.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			br=null;
-		
-		}
-		return buf.toString();
-	}
 	
-	private String doPost(String urlString, String command, String data) throws Exception{
-	    URL                 url;
-	    URLConnection   urlConn;
-	    DataOutputStream    printout;
-	    DataInputStream     input;
-	    // URL of CGI-Bin script.
-	    url = new URL (urlString);
-	    // URL connection channel.
-	    urlConn = url.openConnection();
-	    // Let the run-time system (RTS) know that we want input.
-	    urlConn.setDoInput (true);
-	    // Let the RTS know that we want to do output.
-	    urlConn.setDoOutput (true);
-	    // No caching, we want the real thing.
-	    urlConn.setUseCaches (false);
-	    // Specify the content type.
-	    urlConn.setRequestProperty
-	    ("Content-Type", "application/x-www-form-urlencoded");
-	    // Send POST output.
-	    printout = new DataOutputStream (urlConn.getOutputStream ());
-	    String content =
-	    "token=" + URLEncoder.encode (yardsaleServlet.token) +
-	    "&command="+command +
-	    "&data=" + URLEncoder.encode (data);
-	    printout.writeBytes (content);
-	    printout.flush ();
-	    printout.close ();
-	    // Get response data.
-	    input = new DataInputStream (urlConn.getInputStream ());
-	    StringBuffer res = new StringBuffer();
-	    String str;
-	    while (null != ((str = input.readLine())))
-	    {
-	    res.append(str);
-	    }
-	    input.close ();
-	    return res.toString();
-	}
+	
+//	private String doPost(String urlString, String command, String data) throws Exception{
+//	    URL                 url;
+//	    URLConnection   urlConn;
+//	    DataOutputStream    printout;
+//	    DataInputStream     input;
+//	    // URL of CGI-Bin script.
+//	    url = new URL (urlString);
+//	    // URL connection channel.
+//	    urlConn = url.openConnection();
+//	    // Let the run-time system (RTS) know that we want input.
+//	    urlConn.setDoInput (true);
+//	    // Let the RTS know that we want to do output.
+//	    urlConn.setDoOutput (true);
+//	    // No caching, we want the real thing.
+//	    urlConn.setUseCaches (false);
+//	    // Specify the content type.
+//	    urlConn.setRequestProperty
+//	    ("Content-Type", "application/x-www-form-urlencoded");
+//	    // Send POST output.
+//	    printout = new DataOutputStream (urlConn.getOutputStream ());
+//	    String content =
+//	    "token=" + URLEncoder.encode (yardsaleServlet.token) +
+//	    "&command="+command +
+//	    "&data=" + URLEncoder.encode (data);
+//	    printout.writeBytes (content);
+//	    printout.flush ();
+//	    printout.close ();
+//	    // Get response data.
+//	    input = new DataInputStream (urlConn.getInputStream ());
+//	    StringBuffer res = new StringBuffer();
+//	    String str;
+//	    while (null != ((str = input.readLine())))
+//	    {
+//	    res.append(str);
+//	    }
+//	    input.close ();
+//	    return res.toString();
+//	}
 }

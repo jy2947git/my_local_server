@@ -81,10 +81,25 @@ public class yardsaleServlet extends HttpServlet {
 			String result = this.purge(req, resp);
 	        resp.getWriter().println(result);
 	        resp.getWriter().flush();
+		}else if(command.equalsIgnoreCase("images")){
+			resp.setContentType("text/plain");
+			resp.setCharacterEncoding("UTF-8");
+			String result = this.getImagesOfSale(req, resp);
+	        resp.getWriter().println(result);
+	        resp.getWriter().flush();
 		}else{
 		}
 	}
 	
+	private String getImagesOfSale(HttpServletRequest req,
+			HttpServletResponse resp) {
+		SaleService service = new SaleService();
+		String saleId = req.getParameter("id");
+		if(saleId!=null&&!saleId.equalsIgnoreCase("")){
+			return service.getSaleImages(new Long(saleId));
+		}
+		return service.errorResultToJson(new IllegalArgumentException("id is required"));
+	}
 	private String purge(HttpServletRequest req, HttpServletResponse resp) throws ParseException {
 		String beforeDate = req.getParameter("beforeDate");
 		SaleService service = new SaleService();
@@ -95,7 +110,7 @@ public class yardsaleServlet extends HttpServlet {
 		String id = req.getParameter("id");
 		SaleService service = new SaleService();
 		if(id!=null){
-			return service.deleteItem(Integer.parseInt(id));
+			return service.deleteSale(Integer.parseInt(id));
 		}else{
 			return service.errorResultToJson(new IllegalArgumentException("id is required"));
 		}
@@ -103,7 +118,7 @@ public class yardsaleServlet extends HttpServlet {
 	private String download(HttpServletRequest req, HttpServletResponse resp)  throws ParseException{
 		String id = req.getParameter("id");
 		SaleService service = new SaleService();
-		return service.getItem(Integer.parseInt(id));
+		return service.getSale(Integer.parseInt(id));
 		
 	}
 	private String browse(HttpServletRequest req, HttpServletResponse resp) throws ParseException {
@@ -114,7 +129,7 @@ public class yardsaleServlet extends HttpServlet {
 		SaleService service = new SaleService();
 		List<Sale> results = null;
 		if(latitude!=null && longitude!=null){
-			return service.searchItemByLocationAndDateWithPage(Integer.parseInt(start), Integer.parseInt(end), Double.parseDouble(latitude), Double.parseDouble(longitude));
+			return service.searchSaleByLocationAndDateRange(Integer.parseInt(start), Integer.parseInt(end), Double.parseDouble(latitude), Double.parseDouble(longitude));
 		}else{
 			return service.browseWithPage(Integer.parseInt(start), Integer.parseInt(end));
 		}
@@ -122,10 +137,11 @@ public class yardsaleServlet extends HttpServlet {
 	}
 	private String upload(HttpServletRequest req, HttpServletResponse resp) throws ParseException {
 		String jsonOfSale = req.getParameter("data");
-		
+		//upload json string of Sale without any image data
 		SaleService service = new SaleService();
 		Sale item = service.fromJson(jsonOfSale);
-		return service.saveItem(item);
+		return service.saveSale(item);
 
 	}
+	
 }

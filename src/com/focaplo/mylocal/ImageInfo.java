@@ -17,7 +17,7 @@ public class ImageInfo {
 	private Long imageId;
 	
 	@Persistent
-	private Long itemId;
+	private Long saleId;
 	
 	@Persistent
 	private String imageBlobKey;
@@ -54,11 +54,12 @@ public class ImageInfo {
 	public void setImageId(Long imageId) {
 		this.imageId = imageId;
 	}
-	public Long getItemId() {
-		return itemId;
+	public Long getSaleId() {
+		return saleId;
 	}
-	public void setItemId(Long itemId) {
-		this.itemId = itemId;
+	public void setSaleId(Long saleId) {
+		this.saleId = saleId;
 	}
+
 	
 }

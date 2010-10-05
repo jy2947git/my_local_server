@@ -2,37 +2,102 @@ package com.focaplo.mylocal;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 
 import org.apache.log4j.Logger;
 
 public class NetUtility {
 	protected final static Logger log = Logger.getLogger(NetUtility.class);
 
-	// public static void uploadFile(String url, String[] params, String[]
-	// values, String fileName, byte[] data) throws HttpException, IOException{
-	//
-	// PostMethod filePost = new PostMethod(url);
-	// ByteArrayPartSource baps = new ByteArrayPartSource(fileName, data);
-	// Part[] parts = new Part[params.length+1];
-	// for(int i=0;i<params.length;i++){
-	// parts[i] = new StringPart(params[i], values[i]);
-	// }
-	// parts[parts.length-1] = new FilePart("myFile", baps);
-	//
-	// filePost.setRequestEntity(
-	// new MultipartRequestEntity(parts, filePost.getParams())
-	// );
-	// HttpClient client = new HttpClient();
-	// int status = client.executeMethod(filePost);
-	// log.info("uploaded file " + fileName + " status " + status);
-	// }
+	public static String doGet(String urlString) throws URISyntaxException{
+		//first encode
+		URI uri = new URI(urlString);
+		StringBuffer buf = new StringBuffer();
+		BufferedReader br = null;
+		
+		try {
+			URL url = uri.toURL();
+			log.debug("sending request:" + url);
+			br = new BufferedReader(new InputStreamReader(url.openStream()));
+			String line;
+			
+			while((line=br.readLine())!=null){
+				log.debug(line);
+				buf.append(line);
+			}
+			
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		} finally{
+			try {
+				br.close();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+			br=null;
+		
+		}
+		return buf.toString();
+	}
+	
+	public static String doPost(String urlString, String[] params, String[] values) throws Exception{
+	    URL                 url;
+	    URLConnection   urlConn;
+	    DataOutputStream    printout;
+	    DataInputStream     input = null;
+	    // URL of CGI-Bin script.
+	    url = new URL (urlString);
+	    // URL connection channel.
+	    urlConn = url.openConnection();
+	    // Let the run-time system (RTS) know that we want input.
+	    urlConn.setDoInput (true);
+	    // Let the RTS know that we want to do output.
+	    urlConn.setDoOutput (true);
+	    // No caching, we want the real thing.
+	    urlConn.setUseCaches (false);
+	    // Specify the content type.
+	    urlConn.setRequestProperty
+	    ("Content-Type", "application/x-www-form-urlencoded");
+	    // Send POST output.
+	    printout = new DataOutputStream (urlConn.getOutputStream ());
+	    StringBuffer buffer = new StringBuffer();
+	    for(int i=0;i<params.length;i++){
+	    	buffer.append("&"+ URLEncoder.encode(params[i],"UTF-8") + "=" + URLEncoder.encode(values[i],"UTF-8"));
+	    }
+	    buffer.deleteCharAt(0);
+	    
+	    printout.writeBytes (buffer.toString());
+	    printout.flush ();
+	    printout.close ();
+	    // Get response data.
+	    StringBuffer res = new StringBuffer();
+	    try{
+		    input = new DataInputStream (urlConn.getInputStream ());
+		    BufferedReader br = new BufferedReader(new InputStreamReader(input));
+		    
+		    String str;
+		    while (null != ((str = br.readLine())))
+		    {
+		    res.append(str);
+		    }
+	    }finally{
+	    	input.close ();
+	    }
+	    return res.toString();
+	}
 
 	public static void uploadFile(String urlString, String[] params,
 			String[] values, String contentType, String filePath) throws IOException{
@@ -41,7 +106,7 @@ public class NetUtility {
 	      //File length
 	      int size = (int)file.length(); 
 	      if (size > Integer.MAX_VALUE){
-	        System.out.println("File is to larger");
+	        log.debug("File is to larger");
 	      }
 	      byte[] bytes = new byte[size]; 
 	      DataInputStream dis = new DataInputStream(new FileInputStream(file)); 
@@ -51,11 +116,13 @@ public class NetUtility {
 	                                                bytes.length-read)) >= 0) {
 	        read = read + numRead;
 	      }
-	      System.out.println("File size: " + read);
+	      log.debug("File size: " + read);
 	      // Ensure all the bytes have been read in
 	      if (read < bytes.length) {
-	        System.out.println("Could not completely read: "+file.getName());
+	        log.debug("Could not completely read: "+file.getName());
 	      }
+	      //
+	      NetUtility.uploadFileContent(urlString, params, values, contentType, filePath.substring(filePath.lastIndexOf(File.separator)+1), bytes);
 	}
 	
 	public static void uploadFileContent(String urlString, String[] params,

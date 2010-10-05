@@ -81,7 +81,7 @@ public class SaleService {
 		return gson.toJson(rr, parameterizedType);
 	}
 	@Transactional
-	public String deleteItem(int itemId){
+	public String deleteSale(int itemId){
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try{
 			pm.deletePersistent(pm.getObjectById(Sale.class, itemId));
@@ -93,12 +93,12 @@ public class SaleService {
 		}
 	}
 	@Transactional
-	public String saveItem(Sale item){
+	public String saveSale(Sale item){
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		item.setGeohash(geohash.encode(item.getLongitude(), item.getLatitude()));
 		try{
 			pm.makePersistent(item);
-			log.debug("saved " + item.getItemId());
+			log.debug("saved " + item.getSaleId());
 			return saveResultToJson(item);
 		}catch(Exception e){
 			log.error("Error", e);
@@ -110,11 +110,11 @@ public class SaleService {
 	}
 	
 	@Transactional
-	public String saveItemImage(Long itemId, String imageKey){
+	public String saveSaleImage(Long itemId, String imageKey){
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		ImageInfo ii = new ImageInfo();
 		ii.setImageBlobKey(imageKey);
-		ii.setItemId(itemId);
+		ii.setSaleId(itemId);
 		try{
 			pm.makePersistent(ii);
 			Gson gson = new Gson();
@@ -131,7 +131,7 @@ public class SaleService {
 	}
 	
 	@Transactional
-	public String saveItemIconImage(Long imageId, String iconKey){
+	public String saveSaleIconImage(Long imageId, String iconKey){
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try{
 			ImageInfo info = (ImageInfo) pm.getObjectById(ImageInfo.class, imageId);
@@ -172,10 +172,10 @@ public class SaleService {
 		}finally{
 			pm.close();
 		}
-		return item.getItemId().toString();
+		return item.getSaleId().toString();
 	}
 	*/
-	public String getItem(int itemId){
+	public String getSale(int itemId){
 		Sale item = null;
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try{
@@ -194,15 +194,17 @@ public class SaleService {
 	 * @param itemId
 	 * @return
 	 */
-	public String getItemIconImages(Long itemId){
+	public String getSaleImages(Long itemId){
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query query = null;
 		try{
 			Extent<ImageInfo> extent = pm.getExtent(ImageInfo.class, true);
-			String filter = "itemId==inputItemId";
+			String filter = "saleId==inputSaleId";
 			query = pm.newQuery(extent, filter);
-			query.declareParameters("Long inputItemId");
+			query.declareParameters("Long inputSaleId");
+			log.debug(query.toString());
 			Collection<ImageInfo> results = (Collection<ImageInfo>) query.execute(itemId);
+			log.debug("found " + results);
 			RequestResult<ImageInfo> rr = new RequestResult<ImageInfo>();
 			rr.setGood();
 			rr.getData().addAll(results);
@@ -261,7 +263,7 @@ public class SaleService {
 	}
 	@SuppressWarnings("unchecked")
 	@Transactional
-	public String searchItemByLocationAndDateWithPage(int start, int end, Double latitude, Double longitude){
+	public String searchSaleByLocationAndDateRange(int start, int end, Double latitude, Double longitude){
 		List<Sale> results;
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query query = null;
@@ -297,12 +299,12 @@ public class SaleService {
 			ListIterator ite = results.listIterator();
 			while(ite.hasNext()){
 				Sale si = (Sale)ite.next();
-				System.out.println(si.getItemId() + " " + si.getStartDate() + " " + si.getEndDate());
+				System.out.println(si.getSaleId() + " " + si.getStartDate() + " " + si.getEndDate());
 				if(si.getEndDateDate().before(tomorrowMorning.getTime())){
-					System.out.println("removing " + si.getItemId());
+					System.out.println("removing " + si.getSaleId());
 					ite.remove();
 				}else if(si.getLatitude()>maxlatitude || si.getLatitude()<minLatitude || si.getLongitude()>maxlongitude || si.getLongitude()<minlongitude){
-					System.out.println("remove again " + si.getItemId());
+					System.out.println("remove again " + si.getSaleId());
 					ite.remove();
 					
 				}

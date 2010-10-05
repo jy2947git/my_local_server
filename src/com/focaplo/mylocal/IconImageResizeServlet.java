@@ -47,9 +47,10 @@ public class IconImageResizeServlet extends HttpServlet {
 	}
 
 	private void serve(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		String itemId = request.getParameter("item-id");
-		String blobKey = request.getParameter("blob-key");
-		String newName = request.getParameter("new-name");
+		String saleId = request.getParameter("saleId");
+		String imageId = request.getParameter("imageId");
+		String blobKey = request.getParameter("blobKey");
+		String newName = request.getParameter("newName");
 		String width=request.getParameter("width");
 		String height=request.getParameter("height");
 		byte[] newImageData = this.resizeImage(blobKey, Integer.parseInt(width), Integer.parseInt(height));
@@ -63,7 +64,7 @@ public class IconImageResizeServlet extends HttpServlet {
 			contentType="image/png";
 		}
 		//upload the new image to BlobStore
-		NetUtility.uploadFileContent(uploadUrl, new String[]{"blob-key"}, new String[]{blobKey}, contentType, newName, newImageData);
+		NetUtility.uploadFileContent(uploadUrl, new String[]{"saleId","imageId", "blobKey"}, new String[]{saleId,imageId, blobKey}, contentType, newName, newImageData);
 	}
 
 	private byte[] resizeImage(String blobKey, int width, int height){

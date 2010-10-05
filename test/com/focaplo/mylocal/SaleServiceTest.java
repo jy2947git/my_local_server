@@ -66,10 +66,10 @@ public class SaleServiceTest extends LocalDatastoreTest{
 		SaleService test = new SaleService();
 		{
 			Sale item = this.createSaleItem();
-			String res = test.saveItem(item);
+			String res = test.saveSale(item);
 			java.lang.System.out.println("saved item:" + res);
 			//save image
-			String jsonRes = test.saveItemImage(item.getItemId(), "aoaao");
+			String jsonRes = test.saveSaleImage(item.getSaleId(), "aoaao");
 			java.lang.System.out.println("Save Image:"+jsonRes);
 			Gson gson = new Gson();
 			Type parameterizedType = new TypeToken<RequestResult<ImageInfo>>() {}.getType();
@@ -77,9 +77,9 @@ public class SaleServiceTest extends LocalDatastoreTest{
 			RequestResult<ImageInfo> rs = gson.fromJson(jsonRes, parameterizedType);
 			ImageInfo imageInfo = (ImageInfo)rs.getData().get(0);
 			//save icon image
-			java.lang.System.out.println("Save Icon image:"+test.saveItemIconImage(imageInfo.getImageId(), "aoaao"));
+			java.lang.System.out.println("Save Icon image:"+test.saveSaleIconImage(imageInfo.getImageId(), "aoaao"));
 			//search
-			System.out.println("Search Images:" + test.getItemIconImages(item.getItemId()));
+			System.out.println("Search Images:" + test.getSaleImages(item.getSaleId()));
 		}
 		
 		
@@ -90,7 +90,7 @@ public class SaleServiceTest extends LocalDatastoreTest{
 		//search
 		SaleService test = new SaleService();
 		java.lang.System.out.println(test.browseWithPage(0, 500));
-		java.lang.System.out.println(test.searchItemByLocationAndDateWithPage(0, 100, 100.12345, -20.12345));
+		java.lang.System.out.println(test.searchSaleByLocationAndDateRange(0, 100, 100.12345, -20.12345));
 		java.lang.System.out.println();
 	}
 	@Test
