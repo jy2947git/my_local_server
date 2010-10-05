@@ -112,7 +112,7 @@ public class yardsaleServlet extends HttpServlet {
 		String start = req.getParameter("start");
 		String end = req.getParameter("end");
 		SaleService service = new SaleService();
-		List<SaleItem> results = null;
+		List<Sale> results = null;
 		if(latitude!=null && longitude!=null){
 			return service.searchItemByLocationAndDateWithPage(Integer.parseInt(start), Integer.parseInt(end), Double.parseDouble(latitude), Double.parseDouble(longitude));
 		}else{
@@ -124,7 +124,7 @@ public class yardsaleServlet extends HttpServlet {
 		String jsonOfSale = req.getParameter("data");
 		
 		SaleService service = new SaleService();
-		SaleItem item = service.fromJson(jsonOfSale);
+		Sale item = service.fromJson(jsonOfSale);
 		return service.saveItem(item);
 
 	}

@@ -17,8 +17,8 @@ import com.google.gson.reflect.TypeToken;
 
 public class SaleServiceTest extends LocalDatastoreTest{
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-	private SaleItem createSaleItem() throws ParseException{
-		SaleItem item = new SaleItem();
+	private Sale createSaleItem() throws ParseException{
+		Sale item = new Sale();
 		item.setUserUniqueId("seller123");
 		item.setAddress1("2200 Yale Cir");
 		item.setDescription("this is a test1");
@@ -36,19 +36,19 @@ public class SaleServiceTest extends LocalDatastoreTest{
 	}
 	@Test
 	public void testTranslateSaleItemToJsonString() throws ParseException{
-		SaleItem si = this.createSaleItem();
+		Sale si = this.createSaleItem();
 		SaleService test = new SaleService();
 		java.lang.System.out.println(si);
 		java.lang.System.out.println(test.toJson(si));
 	}
 	@Test
 	public void testTranslateJsonStringToSaleItem() throws ParseException{
-		SaleItem si = this.createSaleItem();
+		Sale si = this.createSaleItem();
 		SaleService test = new SaleService();
 		
 		String jsonStr = test.toJson(si);
 		
-		SaleItem si2 = test.fromJson(jsonStr);
+		Sale si2 = test.fromJson(jsonStr);
 	}
 	
 	@Test
@@ -65,7 +65,7 @@ public class SaleServiceTest extends LocalDatastoreTest{
 	public void testAdd() throws ParseException{
 		SaleService test = new SaleService();
 		{
-			SaleItem item = this.createSaleItem();
+			Sale item = this.createSaleItem();
 			String res = test.saveItem(item);
 			java.lang.System.out.println("saved item:" + res);
 			//save image

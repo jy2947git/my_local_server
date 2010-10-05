@@ -23,8 +23,8 @@ public class AdminClient{
 	//String server="http://localhost:8082/yardsale?token=" + yardsaleServlet.token;
 	String server="http://senselocal.appspot.com/yardsale";
 	protected final Logger log = Logger.getLogger(this.getClass());
-	private SaleItem createSaleItem(int i) throws ParseException{
-		SaleItem item = new SaleItem();
+	private Sale createSaleItem(int i) throws ParseException{
+		Sale item = new Sale();
 		item.setUserUniqueId("seller"+i);
 		item.setAddress1("2200 Yale Cir");
 		item.setCity("Hoffman Estates");
@@ -34,8 +34,10 @@ public class AdminClient{
 		item.setDescription("this is a test"+i);
 //		double mylati=37.331689;
 //		double mylagi=-122.030731;
-		double mylati=42.06577;
-		double mylagi=-88.21957;
+//		double mylati=42.06577;
+//		double mylagi=-88.21957;
+		double mylati=41.881111;
+		double mylagi=-87.632371;
 		double deltaLati=0.01; //0.0001=0.01km,0.01-1km
 		//mylagi+=0.01; //almost 1 KM
 		item.setLatitude(Double.valueOf(mylati+i*deltaLati));
@@ -56,13 +58,15 @@ public class AdminClient{
 //		double mylagi=-88.21957;
 		SaleService service = new SaleService();
 		for(int i=0; i<10;i++){
-			SaleItem si = this.createSaleItem(i);
+			Sale si = this.createSaleItem(i);
 			StringBuffer req=new StringBuffer(server);
 			mylati+=0.01; //0.0001=0.01km,0.01-1km
 			//mylagi+=0.01; //almost 1 KM
 			
 		
-			this.doPost(server, "upload", service.toJson(si));
+			String jsonAddItem = this.doPost(server, "upload", service.toJson(si));
+			//now upload the image
+			
 		}
 	}
 	
@@ -113,7 +117,7 @@ public class AdminClient{
 		return buf.toString();
 	}
 	
-	private void doPost(String urlString, String command, String data) throws Exception{
+	private String doPost(String urlString, String command, String data) throws Exception{
 	    URL                 url;
 	    URLConnection   urlConn;
 	    DataOutputStream    printout;
@@ -142,11 +146,13 @@ public class AdminClient{
 	    printout.close ();
 	    // Get response data.
 	    input = new DataInputStream (urlConn.getInputStream ());
+	    StringBuffer res = new StringBuffer();
 	    String str;
 	    while (null != ((str = input.readLine())))
 	    {
-	    System.out.println (str);
+	    res.append(str);
 	    }
 	    input.close ();
+	    return res.toString();
 	}
 }

@@ -27,40 +27,40 @@ public class SaleService {
 	protected final Logger log = Logger.getLogger(this.getClass());
 	Geohash geohash = new Geohash();
 	
-	public SaleItem fromJson(String jsonString){
+	public Sale fromJson(String jsonString){
 		Gson gson = new Gson();
-		return gson.fromJson(jsonString, SaleItem.class);
+		return gson.fromJson(jsonString, Sale.class);
 	}
 	
-	public String toJson(SaleItem saleItem){
+	public String toJson(Sale sale){
 		Gson gson = new Gson();
-		return gson.toJson(saleItem, SaleItem.class);
+		return gson.toJson(sale, Sale.class);
 	}
 	
-	public String getResultToJson(SaleItem item){
+	public String getResultToJson(Sale item){
 		Gson gson = new Gson();
-		RequestResult<SaleItem> rr = new RequestResult<SaleItem>();
+		RequestResult<Sale> rr = new RequestResult<Sale>();
 		rr.setGood();
 		rr.getData().add(item);
-		Type parameterizedType = new TypeToken<RequestResult<SaleItem>>() {}.getType();
+		Type parameterizedType = new TypeToken<RequestResult<Sale>>() {}.getType();
 		return gson.toJson(rr, parameterizedType);
 	}
 	
-	public String browseResultsToJson(List<SaleItem> items){
+	public String browseResultsToJson(List<Sale> items){
 		Gson gson = new Gson();
-		RequestResult<SaleItem> rr = new RequestResult<SaleItem>();
+		RequestResult<Sale> rr = new RequestResult<Sale>();
 		rr.setGood();
 		rr.getData().addAll(items);
-		Type parameterizedType = new TypeToken<RequestResult<SaleItem>>() {}.getType();
+		Type parameterizedType = new TypeToken<RequestResult<Sale>>() {}.getType();
 		return gson.toJson(rr, parameterizedType);
 	}
 	
-	public String saveResultToJson(SaleItem item){
+	public String saveResultToJson(Sale item){
 		Gson gson = new Gson();
-		RequestResult<SaleItem> rr = new RequestResult<SaleItem>();
+		RequestResult<Sale> rr = new RequestResult<Sale>();
 		rr.setGood();
 		rr.getData().add(item);
-		Type parameterizedType = new TypeToken<RequestResult<SaleItem>>() {}.getType();
+		Type parameterizedType = new TypeToken<RequestResult<Sale>>() {}.getType();
 		return gson.toJson(rr, parameterizedType);
 	}
 	
@@ -68,23 +68,23 @@ public class SaleService {
 		Gson gson = new Gson();
 		RequestResult<ImageInfo> rr = new RequestResult<ImageInfo>();
 		rr.setGood();
-		Type parameterizedType = new TypeToken<RequestResult<SaleItem>>() {}.getType();
+		Type parameterizedType = new TypeToken<RequestResult<Sale>>() {}.getType();
 		return gson.toJson(rr, parameterizedType);
 	}
 	
 	public String errorResultToJson(Exception exception){
 		Gson gson = new Gson();
-		RequestResult<SaleItem> rr = new RequestResult<SaleItem>();
+		RequestResult<Sale> rr = new RequestResult<Sale>();
 		rr.setError(exception);
 		
-		Type parameterizedType = new TypeToken<RequestResult<SaleItem>>() {}.getType();
+		Type parameterizedType = new TypeToken<RequestResult<Sale>>() {}.getType();
 		return gson.toJson(rr, parameterizedType);
 	}
 	@Transactional
 	public String deleteItem(int itemId){
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try{
-			pm.deletePersistent(pm.getObjectById(SaleItem.class, itemId));
+			pm.deletePersistent(pm.getObjectById(Sale.class, itemId));
 			return removeResultToJson();
 		}catch(Exception e){
 			return errorResultToJson(e);
@@ -93,7 +93,7 @@ public class SaleService {
 		}
 	}
 	@Transactional
-	public String saveItem(SaleItem item){
+	public String saveItem(Sale item){
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		item.setGeohash(geohash.encode(item.getLongitude(), item.getLatitude()));
 		try{
@@ -176,10 +176,10 @@ public class SaleService {
 	}
 	*/
 	public String getItem(int itemId){
-		SaleItem item = null;
+		Sale item = null;
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try{
-			item = pm.getObjectById(SaleItem.class, itemId);
+			item = pm.getObjectById(Sale.class, itemId);
 			return getResultToJson(item);
 		}catch(Exception e){
 			return errorResultToJson(e);
@@ -224,12 +224,12 @@ public class SaleService {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query query = null;
 		try{
-			Extent<SaleItem> extent = pm.getExtent(SaleItem.class, true);
+			Extent<Sale> extent = pm.getExtent(Sale.class, true);
 			String filter = "endDate<inputEndDate";
 			query = pm.newQuery(extent, filter);
 			query.declareImports("import java.util.Date");
 			query.declareParameters("Date inputEndDate");
-			Collection<SaleItem> results = (Collection<SaleItem>) query.execute(date);
+			Collection<Sale> results = (Collection<Sale>) query.execute(date);
 			pm.deletePersistentAll(results);
 			return removeResultToJson();
 		}catch(Exception e){
@@ -241,15 +241,15 @@ public class SaleService {
 	}
 	@SuppressWarnings("unchecked")
 	public String browseWithPage(int start, int end){
-		List<SaleItem> results;
+		List<Sale> results;
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query query = null;
-		Extent<SaleItem> extent = pm.getExtent(SaleItem.class, true);
+		Extent<Sale> extent = pm.getExtent(Sale.class, true);
 		try{
 			query = pm.newQuery(extent);
 			query.setRange(start, end);
 			
-			results = (List<SaleItem>) query.execute();//
+			results = (List<Sale>) query.execute();//
 			return browseResultsToJson(results);
 		}catch(Exception e){
 			return errorResultToJson(e);
@@ -262,7 +262,7 @@ public class SaleService {
 	@SuppressWarnings("unchecked")
 	@Transactional
 	public String searchItemByLocationAndDateWithPage(int start, int end, Double latitude, Double longitude){
-		List<SaleItem> results;
+		List<Sale> results;
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query query = null;
 		//time begin with today and end by 7 days later
@@ -281,7 +281,7 @@ public class SaleService {
 		tomorrowMorning.add(Calendar.DAY_OF_YEAR,1);
 //		Calendar sevenDaysLater = Calendar.getInstance();
 //		sevenDaysLater.add(Calendar.DAY_OF_YEAR, this.date_scope);
-		Extent extent = pm.getExtent(SaleItem.class, true);
+		Extent extent = pm.getExtent(Sale.class, true);
 		try{
 			String filter = "geohash>=southWest && geohash<=northEast";
 			query = pm.newQuery(extent, filter);
@@ -289,14 +289,14 @@ public class SaleService {
 
 			query.declareImports("import java.lang.String");
 			query.declareParameters("String southWest ,String northEast");
-			results = (List<SaleItem>) query.execute(southwest, northeast);
+			results = (List<Sale>) query.execute(southwest, northeast);
 			
 		
 			//manually filter by start date, end date, latitude and longtitude
 			System.out.println("find " + results.size() + " results");
 			ListIterator ite = results.listIterator();
 			while(ite.hasNext()){
-				SaleItem si = (SaleItem)ite.next();
+				Sale si = (Sale)ite.next();
 				System.out.println(si.getItemId() + " " + si.getStartDate() + " " + si.getEndDate());
 				if(si.getEndDateDate().before(tomorrowMorning.getTime())){
 					System.out.println("removing " + si.getItemId());

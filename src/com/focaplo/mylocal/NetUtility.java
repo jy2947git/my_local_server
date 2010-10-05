@@ -1,6 +1,9 @@
 package com.focaplo.mylocal;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -32,6 +35,30 @@ public class NetUtility {
 	// }
 
 	public static void uploadFile(String urlString, String[] params,
+			String[] values, String contentType, String filePath) throws IOException{
+		//read the image file bytes
+		File file = new File(filePath); 
+	      //File length
+	      int size = (int)file.length(); 
+	      if (size > Integer.MAX_VALUE){
+	        System.out.println("File is to larger");
+	      }
+	      byte[] bytes = new byte[size]; 
+	      DataInputStream dis = new DataInputStream(new FileInputStream(file)); 
+	      int read = 0;
+	      int numRead = 0;
+	      while (read < bytes.length && (numRead=dis.read(bytes, read,
+	                                                bytes.length-read)) >= 0) {
+	        read = read + numRead;
+	      }
+	      System.out.println("File size: " + read);
+	      // Ensure all the bytes have been read in
+	      if (read < bytes.length) {
+	        System.out.println("Could not completely read: "+file.getName());
+	      }
+	}
+	
+	public static void uploadFileContent(String urlString, String[] params,
 			String[] values, String contentType, String fileName, byte[] data) throws IOException {
 		log.info("trying to upload file to " + urlString + " file name:" + fileName);
 		URL url = new URL(urlString);

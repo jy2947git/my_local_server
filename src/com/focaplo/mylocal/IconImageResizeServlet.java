@@ -63,7 +63,7 @@ public class IconImageResizeServlet extends HttpServlet {
 			contentType="image/png";
 		}
 		//upload the new image to BlobStore
-		NetUtility.uploadFile(uploadUrl, new String[]{"blob-key"}, new String[]{blobKey}, contentType, newName, newImageData);
+		NetUtility.uploadFileContent(uploadUrl, new String[]{"blob-key"}, new String[]{blobKey}, contentType, newName, newImageData);
 	}
 
 	private byte[] resizeImage(String blobKey, int width, int height){

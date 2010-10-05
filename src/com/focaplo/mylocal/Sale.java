@@ -15,12 +15,12 @@ import javax.jdo.annotations.PrimaryKey;
 import javax.persistence.Entity;
 @PersistenceCapable(identityType = IdentityType.APPLICATION)
 
-public class SaleItem{
+public class Sale{
 	static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 	
 	@PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
-	private Long itemId;
+	private Long saleId;
 	@Persistent
 	private Double latitude;
 	@Persistent
@@ -121,14 +121,14 @@ public class SaleItem{
 	@Override
 	public String toString() {
 		StringBuffer buf = new StringBuffer();
-		buf.append("id=" + this.itemId + " deviceId=" + this.userUniqueId + " address1=" + this.getAddress1() + " description=" + this.getDescription() + " startFrom=" + this.startDate + " end=" + this.endDate + " latitude=" + this.getLatitude() + " longitude=" + this.getLongitude() + " geohash=" + this.geohash);
+		buf.append("id=" + this.saleId + " deviceId=" + this.userUniqueId + " address1=" + this.getAddress1() + " description=" + this.getDescription() + " startFrom=" + this.startDate + " end=" + this.endDate + " latitude=" + this.getLatitude() + " longitude=" + this.getLongitude() + " geohash=" + this.geohash);
 		return buf.toString();
 	}
 	public Long getItemId() {
-		return itemId;
+		return saleId;
 	}
 	public void setItemId(Long itemId) {
-		this.itemId = itemId;
+		this.saleId = itemId;
 	}
 	public Double getLatitude() {
 		return latitude;
