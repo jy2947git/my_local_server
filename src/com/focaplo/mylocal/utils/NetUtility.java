@@ -1,4 +1,4 @@
-package com.focaplo.mylocal;
+package com.focaplo.mylocal.utils;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;

@@ -1,4 +1,4 @@
-package com.focaplo.mylocal;
+package com.focaplo.mylocal.sale.service;
 
 
 import java.lang.reflect.Type;
@@ -16,6 +16,8 @@ import javax.jdo.annotations.Transactional;
 import org.apache.log4j.Logger;
 
 import com.focaplo.common.Geohash;
+import com.focaplo.mylocal.sale.model.ImageInfo;
+import com.focaplo.mylocal.sale.model.Sale;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 

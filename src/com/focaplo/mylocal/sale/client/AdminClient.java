@@ -1,4 +1,4 @@
-package com.focaplo.mylocal;
+package com.focaplo.mylocal.sale.client;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -18,6 +18,11 @@ import java.util.Calendar;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
+
+import com.focaplo.mylocal.sale.model.Sale;
+import com.focaplo.mylocal.sale.server.yardsaleServlet;
+import com.focaplo.mylocal.sale.service.SaleService;
+import com.focaplo.mylocal.utils.NetUtility;
 
 public class AdminClient{
 	//String server="http://localhost:8082/yardsale?token=" + yardsaleServlet.token;

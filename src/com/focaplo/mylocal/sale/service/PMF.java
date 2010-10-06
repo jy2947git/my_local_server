@@ -1,4 +1,4 @@
-package com.focaplo.mylocal;
+package com.focaplo.mylocal.sale.service;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManagerFactory;

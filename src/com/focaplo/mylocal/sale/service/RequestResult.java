@@ -1,4 +1,4 @@
-package com.focaplo.mylocal;
+package com.focaplo.mylocal.sale.service;
 
 import java.io.Serializable;
 import java.util.ArrayList;

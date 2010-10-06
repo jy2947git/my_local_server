@@ -1,9 +1,15 @@
-package com.focaplo.mylocal;
+package com.focaplo.mylocal.sale.client;
 
 import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import com.focaplo.mylocal.sale.model.ImageInfo;
+import com.focaplo.mylocal.sale.model.Sale;
+import com.focaplo.mylocal.sale.server.yardsaleServlet;
+import com.focaplo.mylocal.sale.service.RequestResult;
+import com.focaplo.mylocal.sale.service.SaleService;
+import com.focaplo.mylocal.utils.NetUtility;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 

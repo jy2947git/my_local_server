@@ -1,4 +1,4 @@
-package com.focaplo.mylocal;
+package com.focaplo.mylocal.sale.server;
 
 import java.io.IOException;
 import javax.servlet.ServletException;
@@ -13,6 +13,9 @@ import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.Map;
 
+import com.focaplo.mylocal.sale.model.ImageInfo;
+import com.focaplo.mylocal.sale.service.RequestResult;
+import com.focaplo.mylocal.sale.service.SaleService;
 import com.google.appengine.api.blobstore.BlobInfo;
 import com.google.appengine.api.blobstore.BlobInfoFactory;
 import com.google.appengine.api.blobstore.BlobKey;

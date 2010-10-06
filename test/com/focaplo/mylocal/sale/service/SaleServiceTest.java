@@ -1,4 +1,4 @@
-package com.focaplo.mylocal;
+package com.focaplo.mylocal.sale.service;
 
 import java.io.Serializable;
 import java.lang.reflect.Type;
@@ -10,6 +10,10 @@ import java.util.List;
 
 import org.junit.Test;
 
+import com.focaplo.mylocal.sale.model.ImageInfo;
+import com.focaplo.mylocal.sale.model.Sale;
+import com.focaplo.mylocal.sale.service.RequestResult;
+import com.focaplo.mylocal.sale.service.SaleService;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 

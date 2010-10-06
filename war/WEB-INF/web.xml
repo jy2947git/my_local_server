@@ -6,19 +6,19 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
 http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 	<servlet>
 		<servlet-name>yardsale</servlet-name>
-		<servlet-class>com.focaplo.mylocal.yardsaleServlet</servlet-class>
+		<servlet-class>com.focaplo.mylocal.sale.server.yardsaleServlet</servlet-class>
 	</servlet>
 	<servlet>
 		<servlet-name>blobdataservlet</servlet-name>
-		<servlet-class>com.focaplo.mylocal.BlobDataServlet</servlet-class>
+		<servlet-class>com.focaplo.mylocal.sale.server.BlobDataServlet</servlet-class>
 	</servlet>
 	<servlet>
 		<servlet-name>IconImageResizeServlet</servlet-name>
-		<servlet-class>com.focaplo.mylocal.IconImageResizeServlet</servlet-class>
+		<servlet-class>com.focaplo.mylocal.sale.server.IconImageResizeServlet</servlet-class>
 	</servlet>
 	<servlet>
 		<servlet-name>IconImageResizeSuccessServlet</servlet-name>
-		<servlet-class>com.focaplo.mylocal.IconImageResizeSuccessServlet</servlet-class>
+		<servlet-class>com.focaplo.mylocal.sale.server.IconImageResizeSuccessServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>yardsale</servlet-name>

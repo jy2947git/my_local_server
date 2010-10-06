@@ -1,10 +1,14 @@
-package com.focaplo.mylocal;
+package com.focaplo.mylocal.sale.client;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 import org.junit.Test;
+
+import com.focaplo.mylocal.sale.client.SaleClient;
+import com.focaplo.mylocal.sale.model.ImageInfo;
+import com.focaplo.mylocal.sale.model.Sale;
 
 public class SaleClientTest {
 

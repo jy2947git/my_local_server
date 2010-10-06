@@ -1,4 +1,4 @@
-package com.focaplo.mylocal;
+package com.focaplo.mylocal.sale.server;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
+import com.focaplo.mylocal.sale.model.Sale;
+import com.focaplo.mylocal.sale.service.SaleService;
 import com.google.gson.Gson;
 
 @SuppressWarnings("serial")
