@@ -1,8 +1,11 @@
 package com.focaplo.mylocal.sale.server;
 
+import static com.google.appengine.api.labs.taskqueue.TaskOptions.Builder.url;
+
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Enumeration;
 import java.util.List;
 
 import javax.servlet.http.HttpServlet;
@@ -13,7 +16,10 @@ import org.apache.log4j.Logger;
 
 import com.focaplo.mylocal.sale.model.Sale;
 import com.focaplo.mylocal.sale.service.SaleService;
-import com.google.gson.Gson;
+import com.google.appengine.api.labs.taskqueue.Queue;
+import com.google.appengine.api.labs.taskqueue.QueueFactory;
+import com.google.appengine.api.labs.taskqueue.TaskOptions;
+import com.google.appengine.api.labs.taskqueue.TaskOptions.Builder;
 
 @SuppressWarnings("serial")
 public class yardsaleServlet extends HttpServlet {
@@ -47,6 +53,18 @@ public class yardsaleServlet extends HttpServlet {
 		}
 	}
 	
+	private void enqueue(HttpServletRequest req, HttpServlet res){
+		Queue queue = QueueFactory.getQueue("default");
+		TaskOptions taskOptions = Builder.url("/yardsale");
+		Enumeration<String> parameterNames = req.getParameterNames();
+		while(parameterNames.hasMoreElements()){
+			String parameterName = parameterNames.nextElement();
+			String parameterValue = (String)req.getParameter(parameterName);
+			taskOptions.param(parameterName, parameterValue);
+		}
+		queue.add(taskOptions);
+		
+	}
 	private void serve(HttpServletRequest req, HttpServletResponse resp) throws IOException, ParseException {
 		String command=req.getParameter("command");
 		if(command==null){
@@ -89,6 +107,12 @@ public class yardsaleServlet extends HttpServlet {
 			String result = this.getImagesOfSale(req, resp);
 	        resp.getWriter().println(result);
 	        resp.getWriter().flush();
+		}else if(command.equalsIgnoreCase("deleteImage")){
+			resp.setContentType("text/plain");
+			resp.setCharacterEncoding("UTF-8");
+			String result = this.deleteImageOfSale(req, resp);
+	        resp.getWriter().println(result);
+	        resp.getWriter().flush();
 		}else{
 		}
 	}
@@ -102,6 +126,15 @@ public class yardsaleServlet extends HttpServlet {
 		}
 		return service.errorResultToJson(new IllegalArgumentException("id is required"));
 	}
+	
+	private String deleteImageOfSale(HttpServletRequest req, HttpServletResponse res){
+		SaleService service = new SaleService();
+		String imageId = req.getParameter("imageId");
+		if(imageId!=null && !imageId.equalsIgnoreCase("")){
+			return service.deleteImageSoft(new Long(imageId));
+		}
+		return service.errorResultToJson(new IllegalArgumentException("id is required"));
+	}
 	private String purge(HttpServletRequest req, HttpServletResponse resp) throws ParseException {
 		String beforeDate = req.getParameter("beforeDate");
 		SaleService service = new SaleService();
@@ -112,7 +145,7 @@ public class yardsaleServlet extends HttpServlet {
 		String id = req.getParameter("id");
 		SaleService service = new SaleService();
 		if(id!=null){
-			return service.deleteSale(new Long(id));
+			return service.deleteSaleSoft(new Long(id));
 		}else{
 			return service.errorResultToJson(new IllegalArgumentException("id is required"));
 		}
