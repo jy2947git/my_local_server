@@ -24,7 +24,8 @@ public class ImageInfo {
 	@Persistent
 	private String imageIconBlobKey;
 	
-	
+	@Persistent
+	private String status = "valid" ; //valid, invalid
 	
 	public ImageInfo() {
 		super();
@@ -35,6 +36,12 @@ public class ImageInfo {
 		this.imageIconBlobKey = imageIconBlobKey;
 	}
 
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
 	public String getImageBlobKey() {
 		return imageBlobKey;
 	}

@@ -57,6 +57,8 @@ public class Sale{
 	@Persistent
 	private List<Long> images = new ArrayList<Long>();
 	
+	@Persistent
+	private String status = "pending"; //pending, valid, expired, invalid
 	
 	public String getAddress1() {
 		return address1;
@@ -200,6 +202,12 @@ public class Sale{
 	}
 	public void setImages(List<Long> images) {
 		this.images = images;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 

@@ -112,7 +112,7 @@ public class yardsaleServlet extends HttpServlet {
 		String id = req.getParameter("id");
 		SaleService service = new SaleService();
 		if(id!=null){
-			return service.deleteSale(Integer.parseInt(id));
+			return service.deleteSale(new Long(id));
 		}else{
 			return service.errorResultToJson(new IllegalArgumentException("id is required"));
 		}
@@ -120,7 +120,7 @@ public class yardsaleServlet extends HttpServlet {
 	private String download(HttpServletRequest req, HttpServletResponse resp)  throws ParseException{
 		String id = req.getParameter("id");
 		SaleService service = new SaleService();
-		return service.getSale(Integer.parseInt(id));
+		return service.getSale(new Long(id));
 		
 	}
 	private String browse(HttpServletRequest req, HttpServletResponse resp) throws ParseException {

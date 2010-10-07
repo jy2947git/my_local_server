@@ -18,6 +18,9 @@ import org.apache.log4j.Logger;
 import com.focaplo.common.Geohash;
 import com.focaplo.mylocal.sale.model.ImageInfo;
 import com.focaplo.mylocal.sale.model.Sale;
+import com.google.appengine.api.blobstore.BlobKey;
+import com.google.appengine.api.blobstore.BlobstoreService;
+import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -83,9 +86,33 @@ public class SaleService {
 		return gson.toJson(rr, parameterizedType);
 	}
 	@Transactional
-	public String deleteSale(int itemId){
+	public String deleteSaleSoft(Long saleId){
+		//set the status of the image-info to be invalid only
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try{
+			Sale s = pm.getObjectById(Sale.class, saleId);
+			s.setStatus("invalid");
+			pm.makePersistent(s);
+			return this.removeResultToJson();
+		}catch(Exception e){
+			return errorResultToJson(e);
+		}finally{
+			pm.close();
+		}
+	}
+	@Transactional
+	public String deleteSale(Long itemId){
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try{
+			//first delete all the images associated with this sale
+			String jsonOfImages = this.getSaleImages(itemId);
+			Gson gson = new Gson();
+			Type parameterizedType = new TypeToken<RequestResult<ImageInfo>>(){}.getType();
+			RequestResult<ImageInfo> rr = gson.fromJson(jsonOfImages, parameterizedType);
+			List<ImageInfo> images = rr.getData();
+			for(ImageInfo ii:images){
+				this.deleteImage(ii.getImageId());
+			}
 			pm.deletePersistent(pm.getObjectById(Sale.class, itemId));
 			return removeResultToJson();
 		}catch(Exception e){
@@ -125,6 +152,46 @@ public class SaleService {
 			rr.getData().add(ii);
 			Type parameterizedType = new TypeToken<RequestResult<ImageInfo>>() {}.getType();
 			return gson.toJson(rr, parameterizedType);
+		}catch(Exception e){
+			return errorResultToJson(e);
+		}finally{
+			pm.close();
+		}
+	}
+	
+	@Transactional
+	public String deleteImageSoft(Long imageId){
+		//set the status of the image-info to be invalid only
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try{
+			ImageInfo ii = pm.getObjectById(ImageInfo.class, imageId);
+			ii.setStatus("invalid");
+			pm.makePersistent(ii);
+			return this.removeResultToJson();
+		}catch(Exception e){
+			return errorResultToJson(e);
+		}finally{
+			pm.close();
+		}
+	}
+	
+	@Transactional
+	public String deleteImage(Long imageId){
+		//delete image-info record, delete the image blob, delete the icon image blob
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try{
+			ImageInfo ii = pm.getObjectById(ImageInfo.class, imageId);
+			String imageBlobKey = ii.getImageBlobKey();
+			String iconImageBlobKey = ii.getImageIconBlobKey();
+			BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
+			if(imageBlobKey!=null){
+				blobstoreService.delete(new BlobKey(imageBlobKey));
+			}
+			if(iconImageBlobKey!=null){
+				blobstoreService.delete(new BlobKey(iconImageBlobKey));
+			}
+			pm.deletePersistent(ii);
+			return removeResultToJson();
 		}catch(Exception e){
 			return errorResultToJson(e);
 		}finally{
@@ -177,7 +244,7 @@ public class SaleService {
 		return item.getSaleId().toString();
 	}
 	*/
-	public String getSale(int itemId){
+	public String getSale(Long itemId){
 		Sale item = null;
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try{
