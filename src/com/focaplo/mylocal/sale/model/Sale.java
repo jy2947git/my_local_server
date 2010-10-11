@@ -1,6 +1,5 @@
 package com.focaplo.mylocal.sale.model;
 
-import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -12,7 +11,9 @@ import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
-import javax.persistence.Entity;
+import javax.persistence.Transient;
+
+import com.google.gson.Gson;
 @PersistenceCapable(identityType = IdentityType.APPLICATION)
 
 public class Sale{
@@ -28,7 +29,7 @@ public class Sale{
 //	@Persistent
 //	private String address;
 	@Persistent
-	private String description;
+	private String detail;
 	@Persistent
 	private String startDate;
 	@Persistent
@@ -53,13 +54,28 @@ public class Sale{
 	private String phone;
 	@Persistent
 	private String email;
-	//ids of ImageInfo, purposely keep them un-related to avoid problems of one-to-many implementations on GAE
-	@Persistent
-	private List<Long> images = new ArrayList<Long>();
+	//list of ImageInfo, not persistent one-to-many
+	//purposely keep them unrelated to avoid problems of one-to-many implementations on GAE
+	//comment out to replace with List<String> because this cause error on GAE even annotate it with @Transient
+	//private List<ImageInfo> images = new ArrayList<ImageInfo>();
+	//String of Json rep of ImageInfo
+
 	
 	@Persistent
 	private String status = "pending"; //pending, valid, expired, invalid
 	
+	@Persistent
+	private int dataVersion=0;//
+	
+	@Persistent
+	private String iconImageBlobKey; //small image for icon
+	
+	public int getDataVersion() {
+		return dataVersion;
+	}
+	public void setDataVersion(int dataVersion) {
+		this.dataVersion = dataVersion;
+	}
 	public String getAddress1() {
 		return address1;
 	}
@@ -124,7 +140,7 @@ public class Sale{
 	@Override
 	public String toString() {
 		StringBuffer buf = new StringBuffer();
-		buf.append("id=" + this.saleId + " deviceId=" + this.userUniqueId + " address1=" + this.getAddress1() + " description=" + this.getDescription() + " startFrom=" + this.startDate + " end=" + this.endDate + " latitude=" + this.getLatitude() + " longitude=" + this.getLongitude() + " geohash=" + this.geohash);
+		buf.append("id=" + this.saleId + " deviceId=" + this.userUniqueId + " address1=" + this.getAddress1() + " description=" + this.detail + " startFrom=" + this.startDate + " end=" + this.endDate + " latitude=" + this.getLatitude() + " longitude=" + this.getLongitude() + " geohash=" + this.geohash + " status=" + this.status);
 		return buf.toString();
 	}
 
@@ -152,12 +168,7 @@ public class Sale{
 //	public void setAddress(String address) {
 //		this.address = address;
 //	}
-	public String getDescription() {
-		return description;
-	}
-	public void setDescription(String description) {
-		this.description = description;
-	}
+
 	public Date getStartDateDate() {
 		try {
 			return sdf.parse(startDate);
@@ -166,6 +177,12 @@ public class Sale{
 			e.printStackTrace();
 		}
 		return null;
+	}
+	public String getDetail() {
+		return detail;
+	}
+	public void setDetail(String detail) {
+		this.detail = detail;
 	}
 	public void setStartDateDate(Date startDate) {
 		this.startDate = sdf.format(startDate);
@@ -197,17 +214,22 @@ public class Sale{
 	public void setEndDate(String endDate) {
 		this.endDate = endDate;
 	}
-	public List<Long> getImages() {
-		return images;
-	}
-	public void setImages(List<Long> images) {
-		this.images = images;
-	}
+
+
+
+
+
 	public String getStatus() {
 		return status;
 	}
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	public String getIconImageBlobKey() {
+		return iconImageBlobKey;
+	}
+	public void setIconImageBlobKey(String iconImageBlobKey) {
+		this.iconImageBlobKey = iconImageBlobKey;
 	}
 
 

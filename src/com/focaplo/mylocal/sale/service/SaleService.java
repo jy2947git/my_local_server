@@ -2,6 +2,7 @@ package com.focaplo.mylocal.sale.service;
 
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -85,11 +86,34 @@ public class SaleService {
 		Type parameterizedType = new TypeToken<RequestResult<Sale>>() {}.getType();
 		return gson.toJson(rr, parameterizedType);
 	}
+	
+	@Transactional
+	public String updateSaleStatus(Long saleId, String status){
+		//set the status of the image-info to be invalid only
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try{
+			Sale s = pm.getObjectById(Sale.class, saleId);
+			s.setStatus(status);
+			pm.makePersistent(s);
+			return this.saveResultToJson(s);
+		}catch(Exception e){
+			return errorResultToJson(e);
+		}finally{
+			pm.close();
+		}
+	}
+	
 	@Transactional
 	public String deleteSaleSoft(Long saleId){
 		//set the status of the image-info to be invalid only
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try{
+			//first delete all the images associated with this sale
+			List<ImageInfo> images = this.getSaleImages(saleId);
+			for(ImageInfo ii:images){
+				//change the status of the ImageInfo to be "invalid"
+				this.deleteImageSoft(ii.getImageId());
+			}
 			Sale s = pm.getObjectById(Sale.class, saleId);
 			s.setStatus("invalid");
 			pm.makePersistent(s);
@@ -105,11 +129,7 @@ public class SaleService {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try{
 			//first delete all the images associated with this sale
-			String jsonOfImages = this.getSaleImages(itemId);
-			Gson gson = new Gson();
-			Type parameterizedType = new TypeToken<RequestResult<ImageInfo>>(){}.getType();
-			RequestResult<ImageInfo> rr = gson.fromJson(jsonOfImages, parameterizedType);
-			List<ImageInfo> images = rr.getData();
+			List<ImageInfo> images = this.getSaleImages(itemId);
 			for(ImageInfo ii:images){
 				this.deleteImage(ii.getImageId());
 			}
@@ -139,13 +159,14 @@ public class SaleService {
 	}
 	
 	@Transactional
-	public String saveSaleImage(Long itemId, String imageKey){
+	public String saveNewSaleImage(Long itemId, String imageKey){
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		ImageInfo ii = new ImageInfo();
 		ii.setImageBlobKey(imageKey);
 		ii.setSaleId(itemId);
 		try{
 			pm.makePersistent(ii);
+
 			Gson gson = new Gson();
 			RequestResult<ImageInfo> rr = new RequestResult<ImageInfo>();
 			rr.setGood();
@@ -200,12 +221,20 @@ public class SaleService {
 	}
 	
 	@Transactional
-	public String saveSaleIconImage(Long imageId, String iconKey){
+	public String saveSaleIconImage(Long imageId, String iconImageKey, Boolean isUsedAsSaleIcon){
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try{
+			//get the image info, which is already in the data store.
 			ImageInfo info = (ImageInfo) pm.getObjectById(ImageInfo.class, imageId);
-			info.setImageIconBlobKey(iconKey);
+			info.setImageIconBlobKey(iconImageKey);
+			info.setIsUsedAsListIcon(isUsedAsSaleIcon);
 			pm.makePersistent(info);
+			//if this image is used as sale icon, need to update the Sale too
+			if(isUsedAsSaleIcon){
+				Sale s = pm.getObjectById(Sale.class, info.getSaleId());
+				s.setIconImageBlobKey(iconImageKey);
+				pm.makePersistent(s);
+			}
 			Gson gson = new Gson();
 			RequestResult<ImageInfo> rr = new RequestResult<ImageInfo>();
 			rr.setGood();
@@ -263,17 +292,9 @@ public class SaleService {
 	 * @param itemId
 	 * @return
 	 */
-	public String getSaleImages(Long itemId){
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Query query = null;
+	public String getJsonOfSaleImages(Long itemId){
 		try{
-			Extent<ImageInfo> extent = pm.getExtent(ImageInfo.class, true);
-			String filter = "saleId==inputSaleId";
-			query = pm.newQuery(extent, filter);
-			query.declareParameters("Long inputSaleId");
-			log.debug(query.toString());
-			Collection<ImageInfo> results = (Collection<ImageInfo>) query.execute(itemId);
-			log.debug("found " + results);
+			Collection<ImageInfo> results = (Collection<ImageInfo>) this.getSaleImages(itemId);
 			RequestResult<ImageInfo> rr = new RequestResult<ImageInfo>();
 			rr.setGood();
 			rr.getData().addAll(results);
@@ -283,15 +304,38 @@ public class SaleService {
 		}catch(Exception e){
 			return errorResultToJson(e);
 		}finally{
-			query.closeAll();
-			pm.close();
 		}
 	}
 	
 	
+	public List<ImageInfo> getSaleImages(Long saleId) throws Exception{
+		List<ImageInfo> images = new ArrayList<ImageInfo>();
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		Query query = null;
+		try{
+			Extent<ImageInfo> extent = pm.getExtent(ImageInfo.class, true);
+			String filter = "saleId==inputSaleId";
+			query = pm.newQuery(extent, filter);
+			query.declareParameters("Long inputSaleId");
+			log.debug(query.toString());
+			@SuppressWarnings("unchecked")
+			Collection<ImageInfo> results = (Collection<ImageInfo>) query.execute(saleId);
+			log.debug("found " + results);
+			images.addAll(results);
+			return images;
+		}catch(Exception e){
+			log.error("error", e);
+			throw e;
+		}finally{
+			query.closeAll();
+			pm.close();
+		}
+		
+	}
 	@SuppressWarnings("unchecked")
 	@Transactional
 	public String deleteOldRecordsBeforeDate(Date date){
+		//FIXME need to reconsider
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query query = null;
 		try{
@@ -321,6 +365,16 @@ public class SaleService {
 			query.setRange(start, end);
 			
 			results = (List<Sale>) query.execute();//
+			//now find the all the image-infos of the sales
+//			ListIterator<Sale> ite = results.listIterator();
+//			while(ite.hasNext()){
+//				Sale si = (Sale)ite.next();
+//				List<ImageInfo> images = this.getSaleImages(si.getSaleId());
+//				Gson gson = new Gson();
+//				for(ImageInfo image:images){
+//					si.getImageJsons().add(gson.toJson(image, ImageInfo.class));
+//				}
+//			}
 			return browseResultsToJson(results);
 		}catch(Exception e){
 			return errorResultToJson(e);
@@ -378,6 +432,16 @@ public class SaleService {
 					
 				}
 			}
+			//now find the all the image-infos of the sales
+//			ite = results.listIterator();
+//			while(ite.hasNext()){
+//				Sale si = (Sale)ite.next();
+//				List<ImageInfo> images = this.getSaleImages(si.getSaleId());
+//				Gson gson = new Gson();
+//				for(ImageInfo image:images){
+//					si.getImageJsons().add(gson.toJson(image, ImageInfo.class));
+//				}
+//			}
 			return browseResultsToJson(results);
 		}catch(Exception e){
 			return errorResultToJson(e);
@@ -385,5 +449,15 @@ public class SaleService {
 			query.closeAll();
 			pm.close();
 		}
+	}
+	
+	@Transactional
+	public String cleanUpData(){
+		//FIXME not implemented yet!
+		//find all the invalid and expired sales, and hard-delete them
+		//update all sale whose date fall out the next 2 weeks to be "expired"
+		//can we issue "delete from sale where status being "invalid", "expired"?
+		//
+		return this.removeResultToJson();
 	}
 }

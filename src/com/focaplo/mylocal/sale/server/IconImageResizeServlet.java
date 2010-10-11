@@ -54,6 +54,7 @@ public class IconImageResizeServlet extends HttpServlet {
 		String newName = request.getParameter("newName");
 		String width=request.getParameter("width");
 		String height=request.getParameter("height");
+		String isUsedAsSaleIcon = request.getParameter("isUsedAsSaleIcon");
 		byte[] newImageData = this.resizeImage(blobKey, Integer.parseInt(width), Integer.parseInt(height));
 		//the call-back url after new image uploaded to BlobStore
 		String uploadUrl = blobstoreService.createUploadUrl("/IconImageResizeSuccessServlet");
@@ -65,7 +66,7 @@ public class IconImageResizeServlet extends HttpServlet {
 			contentType="image/png";
 		}
 		//upload the new image to BlobStore
-		NetUtility.uploadFileContent(uploadUrl, new String[]{"saleId","imageId", "blobKey"}, new String[]{saleId,imageId, blobKey}, contentType, newName, newImageData);
+		NetUtility.uploadFileContent(uploadUrl, new String[]{"saleId","imageId", "blobKey", "isUsedAsSaleIcon"}, new String[]{saleId,imageId, blobKey, isUsedAsSaleIcon}, contentType, newName, newImageData);
 	}
 
 	private byte[] resizeImage(String blobKey, int width, int height){

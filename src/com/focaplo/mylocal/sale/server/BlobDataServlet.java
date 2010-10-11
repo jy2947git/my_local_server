@@ -46,14 +46,15 @@ public class BlobDataServlet extends HttpServlet {
 			throws ServletException, IOException {
 		log.info("this is after GAE saved the uploaded blob to blobstore");
 		String saleId = req.getParameter("saleId");
-		log.info("item=" + saleId);
+		String isUsedAsSaleIcon = req.getParameter("isUsedAsSaleIcon");
+		log.info("item=" + saleId + " isImageSaleIconf?" + isUsedAsSaleIcon);
 		Map<String, BlobKey> blobs = blobstoreService.getUploadedBlobs(req);
 		BlobKey blobKey = blobs.get("myFile");
 
 		log.info("blob key:" + blobKey.getKeyString());
 		//save the item-image
 		SaleService saleService = new SaleService();
-		String jsonResOfImageInfo = saleService.saveSaleImage(new Long(saleId), blobKey.getKeyString());
+		String jsonResOfImageInfo = saleService.saveNewSaleImage(new Long(saleId), blobKey.getKeyString());
 		//find the new image-id, need it to save the icon-image later
 		Gson gson = new Gson();
 		Type parameterizedType = new TypeToken<RequestResult<ImageInfo>>() {}.getType();
@@ -63,7 +64,7 @@ public class BlobDataServlet extends HttpServlet {
 			Long imageId = image.getImageId();
 			// start a backend task to trim the small
 			// size image
-			this.enqueueIconImageResizing(saleId, imageId, blobKey.getKeyString());
+			this.enqueueIconImageResizing(saleId, imageId, blobKey.getKeyString(), "1".equalsIgnoreCase(isUsedAsSaleIcon)?Boolean.TRUE:Boolean.FALSE);
 		}
 		
 		// redirct to blob list page for testing purpose
@@ -123,7 +124,7 @@ public class BlobDataServlet extends HttpServlet {
 	 * Create a re-size task and put in the queue, which will be processed by the IconImageResizeServlet
 	 * @param imageBlobKey
 	 */
-	private void enqueueIconImageResizing(String saleId, Long imageId, String imageBlobKey) {
+	private void enqueueIconImageResizing(String saleId, Long imageId, String imageBlobKey, Boolean isUsedAsSaleIcon) {
 		log.info("enqueuing " + imageBlobKey);
 		BlobInfoFactory bif = new BlobInfoFactory();
 		BlobInfo bi = bif.loadBlobInfo(new BlobKey(imageBlobKey));
@@ -134,7 +135,7 @@ public class BlobDataServlet extends HttpServlet {
 				.param("saleId", saleId)
 				.param("imageId", imageId.toString())
 				.param("blobKey", imageBlobKey).param("newName", newName)
-				.param("width", "20").param("height", "25"));
+				.param("width", "60").param("height", "60"). param("isUsedAsSaleIcon", isUsedAsSaleIcon?"1":"0"));
 	}
 
 }

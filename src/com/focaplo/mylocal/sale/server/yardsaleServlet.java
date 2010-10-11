@@ -113,16 +113,23 @@ public class yardsaleServlet extends HttpServlet {
 			String result = this.deleteImageOfSale(req, resp);
 	        resp.getWriter().println(result);
 	        resp.getWriter().flush();
+		}else if(command.equalsIgnoreCase("finalizeSale")){
+			resp.setContentType("text/plain");
+			resp.setCharacterEncoding("UTF-8");
+			String result = this.finalizeSale(req, resp);
+	        resp.getWriter().println(result);
+	        resp.getWriter().flush();
 		}else{
 		}
 	}
+	
 	
 	private String getImagesOfSale(HttpServletRequest req,
 			HttpServletResponse resp) {
 		SaleService service = new SaleService();
 		String saleId = req.getParameter("id");
 		if(saleId!=null&&!saleId.equalsIgnoreCase("")){
-			return service.getSaleImages(new Long(saleId));
+			return service.getJsonOfSaleImages(new Long(saleId));
 		}
 		return service.errorResultToJson(new IllegalArgumentException("id is required"));
 	}
@@ -160,7 +167,13 @@ public class yardsaleServlet extends HttpServlet {
 		String latitude = req.getParameter("latitude");
 		String longitude = req.getParameter("longitude");
 		String start = req.getParameter("start");
+		if(start==null || start.equalsIgnoreCase("")){
+			start="0";
+		}
 		String end = req.getParameter("end");
+		if(end==null || end.equalsIgnoreCase("")){
+			end="20";
+		}
 		SaleService service = new SaleService();
 		List<Sale> results = null;
 		if(latitude!=null && longitude!=null){
@@ -175,8 +188,21 @@ public class yardsaleServlet extends HttpServlet {
 		//upload json string of Sale without any image data
 		SaleService service = new SaleService();
 		Sale item = service.fromJson(jsonOfSale);
+		//note the initial status of the sale is "pending". It becomes "valid" after the user issue the "finalizeSale" request
+		//the reason is, in our iphone app, once user click the "add sale" button, we will get his location and immediately
+		//upload a sale to our server (in pending status). User can proceed to take picture and upload images (with the sale id)
+		//and after he clicks the "done" button, the sale becomes valid
+		//we might change this rule later in which case just comment below line
+		item.setStatus("pending");
 		return service.saveSale(item);
 
 	}
-	
+	private String finalizeSale(HttpServletRequest req, HttpServletResponse resp) {
+		SaleService service = new SaleService();
+		String saleId = req.getParameter("id");
+		if(saleId!=null&&!saleId.equalsIgnoreCase("")){
+			return service.updateSaleStatus(new Long(saleId), "valid");
+		}
+		return service.errorResultToJson(new IllegalArgumentException("id is required"));
+	}
 }

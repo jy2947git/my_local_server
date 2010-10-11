@@ -40,13 +40,13 @@ public class IconImageResizeSuccessServlet extends HttpServlet{
 	}
 
 	private void serve(HttpServletRequest req, HttpServletResponse res) throws IOException {
-		log.debug("Sale " + req.getParameter("saleId") + " image " + req.getParameter("imageId") + " original file key " + req.getParameter("blobKey"));
+		log.debug("Sale " + req.getParameter("saleId") + " image " + req.getParameter("imageId") + " original file key " + req.getParameter("blobKey") + " isUsedAsIcon:" + req.getParameter("isUsedAsSaleIcon"));
 	    Map<String, BlobKey> blobs = blobstoreService.getUploadedBlobs(req);
 	    BlobKey blobKey = blobs.get("myFile");
 	    log.debug("the new file blob key:" + blobKey.getKeyString());
 	    //save the item-image
 		SaleService saleService = new SaleService();
-		String jsonResOfImageInfo = saleService.saveSaleIconImage(new Long(req.getParameter("imageId")), blobKey.getKeyString());
+		String jsonResOfImageInfo = saleService.saveSaleIconImage(new Long(req.getParameter("imageId")), blobKey.getKeyString(), "1".equalsIgnoreCase(req.getParameter("isUsedAsSaleIcon")));
 		res.setContentType("text/plain");
 		res.setCharacterEncoding("UTF-8");
         res.getWriter().println(jsonResOfImageInfo);

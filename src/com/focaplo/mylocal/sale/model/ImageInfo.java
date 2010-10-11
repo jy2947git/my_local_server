@@ -20,12 +20,15 @@ public class ImageInfo {
 	private Long saleId;
 	
 	@Persistent
-	private String imageBlobKey;
+	private String imageBlobKey; //big
 	@Persistent
-	private String imageIconBlobKey;
+	private String imageIconBlobKey; //small
 	
 	@Persistent
 	private String status = "valid" ; //valid, invalid
+	
+	@Persistent
+	private Boolean isUsedAsListIcon;
 	
 	public ImageInfo() {
 		super();
@@ -36,6 +39,10 @@ public class ImageInfo {
 		this.imageIconBlobKey = imageIconBlobKey;
 	}
 
+	@Override
+	public String toString() {
+		return this.imageId + " " + this.getStatus() + " " + this.saleId + " " + this.imageBlobKey + " " + this.imageIconBlobKey;
+	}
 	public String getStatus() {
 		return status;
 	}
@@ -67,6 +74,13 @@ public class ImageInfo {
 	public void setSaleId(Long saleId) {
 		this.saleId = saleId;
 	}
+	public Boolean getIsUsedAsListIcon() {
+		return isUsedAsListIcon;
+	}
+	public void setIsUsedAsListIcon(Boolean isUsedAsListIcon) {
+		this.isUsedAsListIcon = isUsedAsListIcon;
+	}
+
 
 	
 }

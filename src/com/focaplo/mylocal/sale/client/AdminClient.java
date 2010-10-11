@@ -36,7 +36,7 @@ public class AdminClient{
 		item.setState("IL");
 		item.setZipcode("60192");
 		item.setCountryCode("US");
-		item.setDescription("this is a test"+i);
+		item.setDetail("this is a test"+i);
 //		double mylati=37.331689;
 //		double mylagi=-122.030731;
 //		double mylati=42.06577;

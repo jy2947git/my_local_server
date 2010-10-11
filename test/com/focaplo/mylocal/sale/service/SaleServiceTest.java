@@ -25,7 +25,7 @@ public class SaleServiceTest extends LocalDatastoreTest{
 		Sale item = new Sale();
 		item.setUserUniqueId("seller123");
 		item.setAddress1("2200 Yale Cir");
-		item.setDescription("this is a test1");
+		item.setDetail("this is a test1");
 		
 		item.setLatitude(Double.parseDouble("100.1234"));
 		item.setLongitude(Double.parseDouble("-20.1234"));
@@ -73,7 +73,7 @@ public class SaleServiceTest extends LocalDatastoreTest{
 			String res = test.saveSale(item);
 			java.lang.System.out.println("saved item:" + res);
 			//save image
-			String jsonRes = test.saveSaleImage(item.getSaleId(), "aoaao");
+			String jsonRes = test.saveNewSaleImage(item.getSaleId(), "aoaao");
 			java.lang.System.out.println("Save Image:"+jsonRes);
 			Gson gson = new Gson();
 			Type parameterizedType = new TypeToken<RequestResult<ImageInfo>>() {}.getType();
@@ -81,9 +81,9 @@ public class SaleServiceTest extends LocalDatastoreTest{
 			RequestResult<ImageInfo> rs = gson.fromJson(jsonRes, parameterizedType);
 			ImageInfo imageInfo = (ImageInfo)rs.getData().get(0);
 			//save icon image
-			java.lang.System.out.println("Save Icon image:"+test.saveSaleIconImage(imageInfo.getImageId(), "aoaao"));
+			java.lang.System.out.println("Save Icon image:"+test.saveSaleIconImage(imageInfo.getImageId(), "aoaao", Boolean.TRUE));
 			//search
-			System.out.println("Search Images:" + test.getSaleImages(item.getSaleId()));
+			System.out.println("Search Images:" + test.getJsonOfSaleImages(item.getSaleId()));
 		}
 		
 		
