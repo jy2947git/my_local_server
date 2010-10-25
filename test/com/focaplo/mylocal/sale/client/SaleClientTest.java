@@ -49,9 +49,9 @@ public class SaleClientTest {
 	
 	@Test
 	public void testUploadImages() throws Exception{
-		client.uploadSaleImage(new Long("39002"), "/Users/jyou00/Downloads/photo.JPG", Boolean.TRUE);
-		client.uploadSaleImage(new Long("39002"), "/Users/jyou00/Downloads/photo.JPG", Boolean.FALSE);
-		client.uploadSaleImage(new Long("39002"), "/Users/jyou00/Downloads/photo.JPG", Boolean.FALSE);
+		client.uploadSaleImage(new Long("54001"), "/Users/jyou00/Downloads/photo.JPG", Boolean.TRUE);
+		client.uploadSaleImage(new Long("54001"), "/Users/jyou00/Downloads/photo.JPG", Boolean.FALSE);
+		client.uploadSaleImage(new Long("54001"), "/Users/jyou00/Downloads/photo.JPG", Boolean.FALSE);
 	}
 	
 	@Test
